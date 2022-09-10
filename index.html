@@ -1,71 +1,217 @@
+<!-- <php
+header("Cache-Control: no-cache, must-revalidate"); // HTTP 1.1
+header("Pragma: no-cache"); // HTTP 1.0
+header("Expires: Wed, 1 Jan 2020 00:00:00 GMT"); // Anytime in the past
+> -->
+
 <!DOCTYPE html>
 <html>
-<style>
-    body {
-        background-color: White;
-    }
 
-    canvas {
-        display: block;
-        border: 1px solid #000000
-    }
-</style>
 
 <head>
-    <title>Canvas</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/3.6.2/fabric.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <title>PID Control</title>
+
+    <style>
+        html {
+            font-family: Helvetica;
+            display: inline-block;
+            margin: 0px auto;
+            text-align: center;
+        }
+
+        body {
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #444444;
+            margin: 50px auto 30px;
+        }
+
+        h3 {
+            color: #444444;
+            margin-bottom: 50px;
+        }
+
+        .button {
+            display: block;
+            width: 80px;
+            background-color: #1abc9c;
+            border: none;
+            color: white;
+            padding: 13px 30px;
+            text-decoration: none;
+            font-size: 25px;
+            margin: 0px auto 35px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .button-on {
+            background-color: #1abc9c;
+        }
+
+        .button-on:active {
+            background-color: #16a085;
+        }
+
+        .button-off {
+            background-color: #34495e;
+        }
+
+        .button-off:active {
+            background-color: #2c3e50;
+        }
+
+        p {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <script>
+
+        var HttpClient = function () {
+            this.get = function (aUrl, aCallback) {
+                var anHttpRequest = new XMLHttpRequest();
+                anHttpRequest.onreadystatechange = function () {
+                    if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
+                        aCallback(anHttpRequest.responseText);
+                }
+
+                anHttpRequest.open("GET", aUrl, true);
+                anHttpRequest.send(null);
+            }
+        }
+
+        function pushValueAngle(e) {
+            
+            var val = document.getElementById("angle").value
+            
+            console.log(val);
+            const url = 'https://api.thingspeak.com/update?api_key=XU89SKWS3ZIIHP52&field1=' + String(val);
+            console.log(url);
+            
+
+            var client = new HttpClient();
+            client.get(url, (resp) => {
+                console.log(resp)
+                console.log(url)
+            });
+        }
+        function pushValueKp(e) {
+            
+            var val = document.getElementById("K_p").value
+            
+            console.log(val);
+            const url = 'https://api.thingspeak.com/update?api_key=XU89SKWS3ZIIHP52&field5=' + String(val);
+            console.log(url);
+            
+
+            var client = new HttpClient();
+            client.get(url, (resp) => {
+                console.log(resp)
+                console.log(url)
+            });
+        }
+        function pushValueKd(e) {
+            
+            var val = document.getElementById("K_d").value
+            
+            console.log(val);
+            const url = 'https://api.thingspeak.com/update?api_key=XU89SKWS3ZIIHP52&field6=' + String(val);
+            console.log(url);
+            
+
+            var client = new HttpClient();
+            client.get(url, (resp) => {
+                console.log(resp)
+                console.log(url)
+            });
+        }
+        function pushValueKi(e) {
+            
+            var val = document.getElementById("K_i").value
+            
+            console.log(val);
+            const url = 'https://api.thingspeak.com/update?api_key=XU89SKWS3ZIIHP52&field7=' + String(val);
+            console.log(url);
+            
+
+            var client = new HttpClient();
+            client.get(url, (resp) => {
+                console.log(resp)
+                console.log(url)
+            });
+        }
+    </script>
 </head>
+<script>
+    setTimeout(function () {
+        window.location.reload(true);
+    }, 30000);
+// setTimeout(window.location.reload(true), 5000)
+// const myTimeout = setTimeout(location.reload(), 5000);
+</script>
 
 <body>
-    <h1>Canvas Image Upload</h1>
-    <script src="https://rawgit.com/kangax/fabric.js/master/dist/fabric.min.js"></script>
-    <input type="file" id="file"><br />
-    <canvas id="canvas" width=1500 height=720></canvas>
-    <script type='text/javascript'>
-        var canvas = new fabric.Canvas('canvas');
-        document.getElementById('file').addEventListener("change", function (e) {
-            var file = e.target.files[0];
-            var reader = new FileReader();
-            reader.onload = function (f) {
-                var data = f.target.result;
-                fabric.Image.fromURL(data, function (img) {
-                    var oImg = img.set({ left: 50, top: 100, angle: 00 }).scale(0.9);
-                    // canvas.clearRect(0, 0, canvas.width, canvas.height);
-                    canvas.add(oImg).renderAll();
-                    var a = canvas.setActiveObject(oImg);
-                    var dataURL = canvas.toDataURL({ format: 'jpeg', quality: 0.8 });
-                    console.log("Canvas Image " + dataURL);
-                    document.getElementById('txt').href = dataURL;
-                });
-            };
-            reader.readAsDataURL(file);
-        });
-        canvas.on('mouse:wheel', function (opt) {
-            var delta = opt.e.deltaY;
-            var pointer = canvas.getPointer(opt.e);
-            var zoom = canvas.getZoom();
-            zoom *= 0.999 ** delta;
-            if (zoom > 20) zoom = 20;
-            if (zoom < 1) zoom = 1;
-            canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
-            opt.e.preventDefault();
-            opt.e.stopPropagation();
-            var vpt = this.viewportTransform;
 
-            if (vpt[4] >= 0) {
-                vpt[4] = 0;
-            } else if (vpt[4] < canvas.getWidth() - 1500 * zoom) {
-                vpt[4] = canvas.getWidth() - 1500 * zoom;
-            }
-            if (vpt[5] >= 0) {
-                vpt[5] = 0;
-            } else if (vpt[5] < canvas.getHeight() - 720 * zoom) {
-                vpt[5] = canvas.getHeight() - 720 * zoom;
-            }
+    <h1>ESP32 with ThingSpeak Server</h1>
+        <form>
+            <label for="quantity"><b>Input Angle (from 0 to 360):</b></label>
+            <input type="number" id="angle" name="angle" min="0" max="360">
+            <input type="button" onClick=pushValueAngle() value="Submit">
+        </form>
+        <br>
+        <form>
+            <label for="quantity"><b>PID proportionality constant K_p: </b></label>
+            <input type="number" id="K_p" name="K_p" min="0" max="1000">
+            <input type="button" onClick=pushValueKp() value="Submit">
+        </form>
+        <br>
+        <form>
+            <label for="quantity"><b>PID Differenciation constant K_d: </b></label>
+            <input type="number" id="K_d" name="K_d" min="0" max="1000">
+            <input type="button" onClick=pushValueKd() value="Submit">
+        </form>
+        <br>
+        <form>
+            <label for="quantity"><b>PID PID Integration constant K_i: </b></label>
+            <input type="number" id="K_i" name="K_i" min="0" max="1000">
+            <input type="button" onClick=pushValueKi() value="Submit">
+        </form>
+        <br>
+    
+
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;"
+        src="https://thingspeak.com/channels/1825221/charts/1?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=75&title=Input+Angle&type=line&xaxis=Time%28+Difference+in+Time+scaled+10x%29&yaxis=Angle+%28in+degrees%29&yaxismax=360&yaxismin=0"></iframe>
+
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;"
+        src="https://thingspeak.com/channels/1825221/charts/2?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=75&title=Angle+traversed&type=line&xaxis=Time%28+Difference+in+Time+scaled+10x+%29&yaxis=Angle+%28in+degrees%29&yaxismin=0"></iframe>
+
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;"
+        src="https://thingspeak.com/channels/1825221/charts/3?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=75&title=Error%28u%29&type=line&xaxis=Time%28+Difference+in+Time+scaled+10x%29&yaxis=PID+Error"></iframe>  
+    <br>
+    <br>
+
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" 
+        src="https://thingspeak.com/channels/1825221/charts/5?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+    
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" 
+        src="https://thingspeak.com/channels/1825221/charts/6?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
+
+    <iframe width="450" height="260" style="border: 1px solid #cccccc;" 
+        src="https://thingspeak.com/channels/1825221/charts/7?bgcolor=%23ffffff&color=%23d62020&dynamic=true&results=60&type=line&update=15"></iframe>
 
 
-        });
-    </script>
+
+
+    
+
+
 </body>
 
 </html>
